@@ -38,6 +38,7 @@ public abstract class BaseTest {
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--remote-allow-origins=*");
+        options.addArguments("--disable-notifications");
 
         driver = new ChromeDriver(options);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
@@ -57,46 +58,9 @@ public abstract class BaseTest {
         getDriver().quit();
     }
 
-    public void clickToElement(WebElement element) {
-        element.click();
-    }
-
-    public void sendKeysToElement(WebElement element, String text) {
-        element.sendKeys(text);
-    }
-
     public String generateName() {
         return UUID.randomUUID().toString().replace("-", "");
     }
 
-    public void provideEmail(String email) {
-        WebElement emailField = getDriver().findElement(By.cssSelector("input[type='email']"));
-        clickToElement(emailField);
-        sendKeysToElement(emailField, email);
-    }
 
-    public void providePassword(String password) {
-        WebElement passwordField = getDriver().findElement(By.cssSelector("input[type='password']"));
-        clickToElement(passwordField);
-        sendKeysToElement(passwordField, password);
-    }
-    public void openPlaylist() {
-        WebElement emptyPlaylist = getDriver().findElement(By.cssSelector(".playlist:nth-child(3)"));
-        clickToElement(emptyPlaylist);
-    }
-
-    public void clickDeletePlaylistButton() throws InterruptedException {
-        WebElement deletePlaylist = getDriver().findElement(By.cssSelector(".btn-delete-playlist"));
-        clickToElement(deletePlaylist);
-       // WebElement deletePlaylistSubmit = getDriver().findElement(By.cssSelector("button[class='ok'"));
-        //clickToElement(deletePlaylistSubmit);
-        Wait<WebDriver> wait = new WebDriverWait(getDriver(), Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.success.show")));
-       // Thread.sleep(2000);
-    }
-
-    public String DeletePlaylistMsg(){
-        WebElement notificationMsg = getDriver().findElement(By.cssSelector("div.success.show"));
-        return notificationMsg.getText();
-    }
 }
