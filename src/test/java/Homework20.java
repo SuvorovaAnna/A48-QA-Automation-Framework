@@ -7,21 +7,28 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+import pom.DeletePlaylistPage;
+import pom.LoginPage;
 
 import java.time.Duration;
 
 public class Homework20 extends BaseTest{
+
+    LoginPage loginPage;
+    DeletePlaylistPage deletePlaylistPage;
+
     @Test(dataProvider ="loginParameters", dataProviderClass = DataProviderClass.class)
     @Parameters({"qaUrl"})
     public void deletePlayList(String email, String password) throws InterruptedException{
         WebElement loginButton = getDriver().findElement(By.cssSelector("button[type='submit']"));
 
-        provideEmail(email);
-        providePassword(password);
+        loginPage = new LoginPage(getDriver());
+        deletePlaylistPage = new DeletePlaylistPage(getDriver());
 
-        clickToElement(loginButton);
+        loginPage.provideEmail(email);
+        loginPage.providePassword(password);
+        loginPage.clickLoginButton();
 
-        Wait<WebDriver> wait = new WebDriverWait(getDriver(), Duration.ofSeconds(10));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".avatar")));
 
         loginButton = getDriver().findElement(By.cssSelector("button[type='submit']"));
@@ -30,8 +37,8 @@ public class Homework20 extends BaseTest{
         Assert.assertTrue(getDriver().findElement(By.cssSelector(".avatar")).isDisplayed());
         Assert.assertFalse(loginButton.isDisplayed());
 
-        openPlaylist();
-        clickDeletePlaylistButton();
+        deletePlaylistPage.openPlaylist();
+        deletePlaylistPage.clickDeletePlaylistButton();
 
         WebElement notificationMsg = getDriver().findElement(By.cssSelector("div.success.show"));
         Assert.assertTrue(notificationMsg.isDisplayed());
