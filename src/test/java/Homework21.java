@@ -8,19 +8,23 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+import pom.LoginPage;
 
 import java.time.Duration;
 
 public class Homework21 extends BaseTest{
+
+    LoginPage loginPage;
     public static final String NEW_PLAYLIST_NAME = "New Name";
     @Test(dataProvider ="loginParameters", dataProviderClass = DataProviderClass.class)
     public void renamePlaylist(String email, String password){
         WebElement loginButton = getDriver().findElement(By.cssSelector("button[type='submit']"));
 
-        provideEmail(email);
-        providePassword(password);
+        loginPage = new LoginPage(getDriver());
 
-        clickToElement(loginButton);
+        loginPage.provideEmail(email);
+        loginPage.providePassword(password);
+        loginPage.clickLoginButton();
 
         wait.until(ExpectedConditions.visibilityOf(loginButton));
 
