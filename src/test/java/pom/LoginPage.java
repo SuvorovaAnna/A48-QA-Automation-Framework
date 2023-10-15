@@ -3,28 +3,41 @@ package pom;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class LoginPage extends BasePage{
+
+    @FindBy(css = "button[type='submit']")
+    WebElement loginButton;
+
+    @FindBy(css = "input[type='email']")
+    WebElement emailField;
+
+    @FindBy(css = "input[type='password']")
+    WebElement passwordField;
+
     public LoginPage(WebDriver driver) {
         super(driver);
     }
 
-    public void provideEmail(String email) {
-        WebElement emailField = findWebElement(By.cssSelector("input[type='email']"));
+    public LoginPage provideEmail(String email) {
         clickToElement(emailField);
         sendKeysToElement(emailField, email);
+        return this;
     }
 
-    public void providePassword(String password) {
-        WebElement passwordField = findWebElement(By.cssSelector("input[type='password']"));
+    public LoginPage providePassword(String password) {
         clickToElement(passwordField);
         sendKeysToElement(passwordField, password);
+        return this;
     }
 
-    public void clickLoginButton(){
-        WebElement loginButton = findWebElement(By.cssSelector("button[type='submit']"));
+    public void clickLoginButton() {
         clickToElement(loginButton);
     }
 
-
+    public void waitUntilLoginButtonDisplayed() {
+        waitUntilWebElementDisplayed(loginButton);
+    }
 }
