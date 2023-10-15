@@ -16,13 +16,13 @@ public class DeletePlaylistPage extends BasePage{
         clickToElement(emptyPlaylist);
     }
 
-    public void clickDeletePlaylistButton() throws InterruptedException {
+    public void clickDeletePlaylistButton() {
         WebElement deletePlaylist = findWebElement(By.cssSelector(".btn-delete-playlist"));
         clickToElement(deletePlaylist);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.success.show")));
     }
 
-    public String DeletePlaylistMsg(){
+    public String DeletePlaylistMsg() {
         WebElement notificationMsg = findWebElement(By.cssSelector("div.success.show"));
         return notificationMsg.getText();
     }
