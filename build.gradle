@@ -18,11 +18,15 @@ dependencies {
 test {
     useTestNG() {
         suites "src/test/resources/TestNG.xml"
+        //add possibility to choose browser
+        systemProperty "browser", System.getProperty("browser")
     }
 }
 
 task smokeTest(type: Test) {
     useTestNG() {
         suites "src/test/resources/TestNG.xml"
+        //add possibility to choose browser
+        systemProperty "browser", System.getProperty("browser")
     }
 }
