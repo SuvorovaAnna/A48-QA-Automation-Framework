@@ -20,6 +20,7 @@ import org.testng.annotations.Parameters;
 
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.time.Duration;
 import java.util.UUID;
 
@@ -27,38 +28,44 @@ import static java.sql.DriverManager.getDriver;
 
 public abstract class BaseTest {
 
-    WebDriver driver;
-    public static final String QA_URL = "https://qa.koel.app/#!/home";
+    private WebDriver driver;
+    String prodUrl = "https://koel.dev/";
     //String qaUrl = "https://qa.koel.app/";
     Actions actions;
     Wait<WebDriver> wait;
+    private static final ThreadLocal<WebDriver> TREAD_LOCAL_DRIVER = new ThreadLocal<>();
+    public static final String QA_URL = "https://qa.koel.app/#!/home";
 
-    @BeforeSuite
-    static void setupClass() {
-        WebDriverManager.chromedriver().setup();
-    }
+    //@BeforeSuite
+    //static void setupClass() {
+      //  WebDriverManager.chromedriver().setup();
+    //}
 
     @BeforeMethod
     @Parameters({"qaUrl"})
     public void setup(String url) throws MalformedURLException {
+        TREAD_LOCAL_DRIVER.set(pickDriver(System.getProperty("browser")));
 
-        pickDriver(System.getProperty("browser"));
+        TREAD_LOCAL_DRIVER.get().manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+
+       // pickDriver(System.getProperty("browser"));
 
         //ChromeOptions options = new ChromeOptions();
         //options.addArguments("--remote-allow-origins=*");
         //options.addArguments("--disable-notifications");
 
         //driver = new ChromeDriver(options);
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        //driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
-        actions = new Actions(driver);
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        actions = new Actions(TREAD_LOCAL_DRIVER.get());
+        wait = new WebDriverWait(TREAD_LOCAL_DRIVER.get(), Duration.ofSeconds(10));
 
-        driver.get(url);
+        TREAD_LOCAL_DRIVER.get().get(url);
     }
 
     public WebDriver getDriver() {
-        return driver;
+        return TREAD_LOCAL_DRIVER.get();
     }
 
     @AfterMethod
@@ -86,13 +93,15 @@ public abstract class BaseTest {
                 driver = new ChromeDriver(options);
                 return driver;
             case "grid-chrome":
-                desiredCapabilities.setCapability("browser", "chrome");
+                desiredCapabilities.setBrowserName("chrome");
                 driver = new RemoteWebDriver(URI.create(gridUrl).toURL(), desiredCapabilities);
                 return driver;
 //            case "grid-firefox":
 //                desiredCapabilities.setCapability("browser", "firefox");
 //                driver = new RemoteWebDriver(URI.create(gridUrl).toURL(), desiredCapabilities);
 //                return driver;
+            case "lambda-test":
+                return getLambdaDriver();
             default:
                 WebDriverManager.safaridriver().setup();
                 driver = new SafariDriver();
@@ -100,5 +109,20 @@ public abstract class BaseTest {
         }
     }
 
+    public WebDriver getLambdaDriver() throws MalformedURLException {
+        String userName = "suvorova755";
+        String authKey = "c4RPV0qNZEftd0sp5ytXuvO4gh1EKkrJIhY4Yl3ijqjZaWwGIm";
+        String hub = "@hub.lambdatest.com/wd/hub";
 
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        capabilities.setCapability("platform", "Windows 10");
+        capabilities.setCapability("browserName", "Chrome");
+        capabilities.setCapability("version", "106.0");
+        capabilities.setCapability("resolution", "1024x768");
+        capabilities.setCapability("build", "TestNG With Java");
+        capabilities.setCapability("name", this.getClass().getName());
+        capabilities.setCapability("plugin", "git-testng");
+
+        return new RemoteWebDriver(new URL("https://" + userName + ":" + authKey + hub), capabilities);
+    }
 }
